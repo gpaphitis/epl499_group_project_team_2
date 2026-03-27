@@ -134,7 +134,7 @@ def count_negation(text: str) -> dict:
     Counts negation words in a tweet.
     Returns: {'negation_count': count}
     """
-    tokens = text.lower().split()
+    tokens=tokenizer(text)
     return {'negation_count': sum(1 for t in tokens if t in _NEGATION)}
 
 # Negation ratio — proportion of negation words relative to total tokens
@@ -143,7 +143,7 @@ def negation_ratio(text: str) -> dict:
     Computes ratio of negation words over total tokens in a tweet.
     Returns: {'negation_ratio': float}
     """
-    tokens = text.lower().split()
+    tokens = tokenizer(text)
     n = len(tokens) or 1
     return {'negation_ratio': sum(1 for t in tokens if t in _NEGATION) / n}
 
@@ -182,14 +182,14 @@ def count_elongated_words(text: str) -> dict:
 
 
 # Longer words on average may indicate more formal or aggressive language
-def avg_word_length(text: str) -> dict:
+def avg_token_length(text: str) -> dict:
     """
-    Computes mean character length across all words in a tweet.
-    Returns: {'avg_word_length': float}
+    Computes mean character length across all tokens in a tweet.
+    Returns: {'avg_token_length': float}
     """
-    words = text.split()
-    avg = sum(len(w) for w in words) / len(words) if words else 0
-    return {'avg_word_length': avg}
+    tokens = tokenizer(text)
+    avg = sum(len(t) for t in tokens) / len(tokens) if tokens else 0
+    return {'avg_token_length': avg}
 
 import spacy
 nlp = spacy.load("en_core_web_sm")
@@ -267,5 +267,5 @@ def count_profanity(text: str) -> dict:
     Counts profanity words in a tweet using the better-profanity lexicon.
     Returns: {'profanity_count': count}
     """
-    tokens = text.lower().split()
+    tokens=tokenizer(text)
     return {'profanity_count': sum(1 for t in tokens if profanity.contains_profanity(t))}
