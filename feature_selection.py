@@ -232,7 +232,7 @@ def pos_tag_counts(text: str) -> dict:
         counts[key + '_ratio'] = counts[key] / n
 
     return counts
-
+import nltk
 from nltk.corpus import opinion_lexicon
 nltk.download('opinion_lexicon', quiet=True)
 
