@@ -10,6 +10,14 @@ The project focuses on multiclass sentiment classification of tweets from Twitte
 classifies tweets as Positive, Negative or Neutral. To achieve this, we implement multiple custom features relevant to the task,
 perform feature selection using a Random Forest classifier to identify the most useful features, and train a neural classifier, using Optuna to optimize its hyperparameters.
 
+## Preprocessing Pipeline
+Each tweet is passed through the appropriate preprocessing steps needed for each feature extraction method:
+1. **Uncontracting**: expands contractions (e.g. *don't* → *do not*) to preserve negation signals.
+2. **Tokenization**: uses the ekphrasis social tokenizer, which handles tokens like hashtags, mentions, and emoticons.
+3. **Lowercasing**: normalizes token casing.
+4. **Stopword removal**: removes common English stopwords using NLTK.
+5. **Lemmatization**: reduces words to their base form using WordNet.
+
 ## Feature Types Used
 ### Lexical Features
 - TF-IDF Features: Top 1000 unigrams and bigrams. Important words and phrases may be strongly associated with positive or negative sentiment
@@ -26,6 +34,7 @@ perform feature selection using a Random Forest classifier to identify the most 
 - Count Of Positive and Negative Emoticons: Captures sentiment carried from emoticons
 - Number of Positive Words: Direct correlation with positive sentiment
 - Number of Negative Words: Direct correlation with negative sentiment
+- GloVe embeddings: Global word co-ocurrence statistics, capturing scemantic similarity between tokens
 
 ### Structural Features
 - Log of Number of Tokens: Longer tweets may correlate with negative emotions.
@@ -43,4 +52,51 @@ perform feature selection using a Random Forest classifier to identify the most 
 - Count of Profanity Words: Profanity often correlates with strong negative emotions
 
 ## Model Implemented
+The geral achitecture used is an MLP. 
+
+
+We ran optuna for 75 iterations to find the best model hyperparameters:
+
+| Hyperparameter  | Value                  |
+|-----------------|------------------------|
+| n_layers        | 3                      |
+| units           | 64                     |
+| activation      | gelu                   |
+| dropout_rate    | 0.2                    |
+| optimizer       | adam                   |
+| learning_rate   | 0.0006123962416241381  |
+| batch_size      | 32                     |
+
+## Feature Importance
+We selected the top 50 features as input to our model through training a Random Forrest clasifier.
+
+
+![Feature Importance](feature_importance.png)
+
+### Interpretation
+Vader and polarity are as expected the most important features, as they were trained specifically on social media posts (including twitter). 
+Important to node, a large amount of the selected features are GloVe embeddings, these were also expected as they were trained on tweets. 
 ## Key Results & Findings
+
+![Confusion Matrix](evaluation.png)
+
+| Class         | Precision | Recall | F1-Score | Support |
+|---------------|-----------|--------|----------|---------|
+| 0             | 0.71      | 0.54   | 0.61     | 1986    |
+| 1             | 0.63      | 0.79   | 0.70     | 2969    |
+| 2             | 0.69      | 0.52   | 0.59     | 1187    |
+| **Accuracy**  |           |        | **0.66** | 6142    |
+| **Macro avg** | 0.68      | 0.62   | 0.63     | 6142    |
+| **Weighted avg** | 0.67   | 0.66   | 0.65     | 6142    |
+
+### Class-level analysis
+
+The model achieves 66% accuracy overall, which is reasonable for Twitter sentiment.
+
+**Neutral**: tweets are predicted best (F1=0.70), largely because they dominate the dataset (~48% of samples). The trade-off is that the model plays it safe on uncertain tweets and defaults to Neutral, which drags down recall for the other two classes.
+
+**Negative**: tweets are caught with decent precision (0.71) when predicted, but the model misses nearly half of them (recall 0.54).
+
+**Positive**: tweets are the weakest point: fewest training examples and the lowest recall (0.52), making them hardest to distinguish from Neutral.
+
+In short, the model is conservative, it handles the majority class well but struggles to pick up on subtle positive or negative signals in noisy tweet text.
