@@ -80,23 +80,23 @@ Important to node, a large amount of the selected features are GloVe embeddings,
 
 ![Confusion Matrix](evaluation.png)
 
-| Class         | Precision | Recall | F1-Score | Support |
-|---------------|-----------|--------|----------|---------|
-| 0             | 0.71      | 0.54   | 0.61     | 1986    |
-| 1             | 0.63      | 0.79   | 0.70     | 2969    |
-| 2             | 0.69      | 0.52   | 0.59     | 1187    |
-| **Accuracy**  |           |        | **0.66** | 6142    |
-| **Macro avg** | 0.68      | 0.62   | 0.63     | 6142    |
-| **Weighted avg** | 0.67   | 0.66   | 0.65     | 6142    |
+| Class        | Precision | Recall | F1-Score | Support |
+|--------------|-----------|--------|----------|---------|
+| 0            | 0.67      | 0.60   | 0.63     | 1986    |
+| 1            | 0.65      | 0.71   | 0.68     | 2969    |
+| 2            | 0.63      | 0.60   | 0.62     | 1187    |
+| accuracy     |           |        | 0.65     | 6142    |
+| macro avg    | 0.65      | 0.64   | 0.64     | 6142    |
+| weighted avg | 0.65      | 0.65   | 0.65     | 6142    |
 
 ### Class-level analysis
 
-The model achieves 66% accuracy overall, which is reasonable for Twitter sentiment.
 
-**Neutral**: tweets are predicted best (F1=0.70), largely because they dominate the dataset (~48% of samples). The trade-off is that the model plays it safe on uncertain tweets and defaults to Neutral, which drags down recall for the other two classes.
+The model achieves 65% accuracy overall, which is reasonable for Twitter sentiment.
 
-**Negative**: tweets are caught with decent precision (0.71) when predicted, but the model misses nearly half of them (recall 0.54).
+Neutral tweets are predicted best (F1=0.68), largely because they dominate the dataset (~48% of samples). Recall is highest here at 0.71, which suggests the model plays it safe on uncertain tweets and defaults to Neutral, dragging down recall for the other two classes.
+Negative tweets are caught with the highest precision of any class (0.67) when predicted, but the model misses 40% of them (recall 0.60), yielding an F1 of 0.63.
 
-**Positive**: tweets are the weakest point: fewest training examples and the lowest recall (0.52), making them hardest to distinguish from Neutral.
+Positive tweets are the weakest point: fewest training examples (~19% of samples) and the lowest F1 (0.62), with both precision (0.63) and recall (0.60) underperforming. They are the hardest to distinguish from Neutral.
 
 In short, the model is conservative, it handles the majority class well but struggles to pick up on subtle positive or negative signals in noisy tweet text.
